@@ -3,7 +3,7 @@
 The Flink Datadog integration enables streamlined monitoring, metrics tracking, and log management across Kubernetes resources.\
 In order to achieve this integration, the following steps must be carried out.
 
-Step 1 Set Worker name.\
+Step 1 Set **Worker name**.\
 The name in the Chart.yaml file `flink-pipeline-template` must be meaningful, as it will be used in all files in `chart/` folder and will represent the **worker's name**.
 For example, in the following repository `dataeng-dip-etl-dt-auth-acquirerrequested`, the name in the Chart.yaml is represented as follows: `flink-dip-acquirer-requested`.
 
@@ -11,8 +11,8 @@ If you want to use this template for another pipeline you have to change all ref
 The fastest way doing this is using the command 
 ```grep -rl flink-pipeline-template chart/ | xargs sed -i 's/flink-pipeline-template/flink-dip-acquirer-requested/'```
 
-Step 2 Introduce the secret and all the related components around it.
-Step 2.1 Create **externalsecret-datadogapi.yaml**
+Step 2 Introduce the secret and all the related components around it.\
+Step 2.1 Create **externalsecret-datadogapi.yaml**.
 The **externalsecret-datadogapi.yaml** file sets up an ExternalSecret in Kubernetes to securely retrieve the Datadog API key from an external secret manager when datadogConfig.enabled is true. 
 The name `externalsecret-datadog-{{ include "flink-pipeline-template.fullname" . }}` gives a unique identifier for the ExternalSecret, while `{{ include "flink-pipeline-template.labels" . | nindent 4 }}` applies standardized labels.
 The spec section specifies the refresh interval for fetching the secret, the reference to the secret store, and the key-value mapping for the API key, ensuring the secret is kept up-to-date and accessible to the application.
@@ -41,7 +41,7 @@ spec:
       metadataPolicy: None
 {{- end }}
 ```
-Step 2.2 Create **secretstore.yaml** 
+Step 2.2 Create **secretstore.yaml** .
 The **secretstore.yaml** file defines a SecretStore resource in Kubernetes to securely connect to AWS Secrets Manager when datadogConfig.enabled is true.
 It uses JWT authentication with a specified service account to securely retrieve secrets from the corresponding AWS region.
 
@@ -65,7 +65,7 @@ spec:
             name: eso-flink-sa-{{ include "flink-pipeline-template.serviceAccountName" . }}
 {{- end }}
 ```
-Step 2.3 Create **serviceaccount-secretstore.yaml**
+Step 2.3 Create **serviceaccount-secretstore.yaml**.
 The **serviceaccount-secretstore.yaml** file creates a Kubernetes ServiceAccount named `eso-flink-sa-{{ include "flink-pipeline-template.serviceAccountName" . }}` when datadogConfig.enabled is true,
 with an optional annotation for an AWS role ARN if smSecretRole is provided, enabling secure access on the ServiceAccount to AWS Secrets Manager for fetching secrets.
 
@@ -84,7 +84,7 @@ metadata:
   {{- end }}
 {{- end }}
 ```
-Step 3 Confugiration on **flinkdeployment.yaml**
+Step 3 Confugiration on **flinkdeployment.yaml**.
 The following configuration on **flinkdeployment.yaml** enables Datadog integration for monitoring and logging in Flink.
 It sets the DD_APIKEY environment variable to securely fetch the Datadog API key from the Kubernetes ExternalSecret named `externalsecret-datadog-{{ include "flink-pipeline-template.fullname" . }}`, 
 using the apiKey reference. Then, if Datadog is enabled and `flinkConfDir` is defined, it sets the `FLINK_CONF_DIR` environment variable accordingly. 
@@ -179,7 +179,7 @@ datadogConfig:
     businessUnit: Planet-Portal    #specifies a label that categorizes the pods by the business unit.
 ```
 
-Step 5 Confugiration on **_helpers.tpl**
+Step 5 Confugiration on **_helpers.tpl**.
 The following DataDog functions were introduced in **_helpers.tpl**:
 Internal Labels Function - `_flink-pipeline-template.dd-labels`: Defines default Datadog labels by setting service to the fully qualified chart name (as defined by `flink-pipeline-template.fullname`)
 and version to the image tag or "latest", then outputs them in JSON format for consistent use.
@@ -230,7 +230,7 @@ Logs labels
 {{- end }}
 ```
 
-Step 6 Confugration on the **docker-entrypoint.sh** script
+Step 6 Confugration on the **docker-entrypoint.sh** script.
 The **docker-entrypoint.sh** script facilitates the setup of the Flink environment by initializing configuration files and setting important options,
 ensuring that the application is correctly configured before it starts running.The `FLINK_CONF_DIR` variable defaults to `/opt/etl/conf` if not explicitly defined, and it creates that directory along with an empty `flink-conf.yaml` file within it. 
 The script then copies the default `flink-conf.yaml` from `/opt/flink/conf/` to the new configuration directory, setting the `metrics.reporter.dghttp.apikey` option to the value of `DD_APIKEY`. 
@@ -251,7 +251,7 @@ set_config_option  metrics.reporter.dghttp.apikey ${DD_APIKEY}
 cat /opt/flink/conf/log4j-console.properties >  ${FLINK_CONF_DIR}/log4j-console.properties
 ```
 
-Step 7 Logging on the **Dockerfile** 
+Step 7 Logging on the **Dockerfile**.
 The follwoing three libraries are added to the **Dockerfile** as they are relate to having JSON logging instead of textual ones, which allows DataDog to group the logs in a more normal way.
 
 The additional libraries in the **Dockerfile** are as follows:
