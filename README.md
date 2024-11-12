@@ -12,7 +12,7 @@ The fastest way doing this is using the command
 ```grep -rl flink-pipeline-template chart/ | xargs sed -i 's/flink-pipeline-template/flink-dip-acquirer-requested/'```
 
 Step 2 Introduce the secret and all the related components around it.\
-Step 2.1 Create **externalsecret-datadogapi.yaml**.
+Step 2.1 Create **externalsecret-datadogapi.yaml**.\
 The **externalsecret-datadogapi.yaml** file sets up an ExternalSecret in Kubernetes to securely retrieve the Datadog API key from an external secret manager when datadogConfig.enabled is true. 
 The name `externalsecret-datadog-{{ include "flink-pipeline-template.fullname" . }}` gives a unique identifier for the ExternalSecret, while `{{ include "flink-pipeline-template.labels" . | nindent 4 }}` applies standardized labels.
 The spec section specifies the refresh interval for fetching the secret, the reference to the secret store, and the key-value mapping for the API key, ensuring the secret is kept up-to-date and accessible to the application.
@@ -41,7 +41,7 @@ spec:
       metadataPolicy: None
 {{- end }}
 ```
-Step 2.2 Create **secretstore.yaml** .
+Step 2.2 Create **secretstore.yaml**.\
 The **secretstore.yaml** file defines a SecretStore resource in Kubernetes to securely connect to AWS Secrets Manager when datadogConfig.enabled is true.
 It uses JWT authentication with a specified service account to securely retrieve secrets from the corresponding AWS region.
 
@@ -65,7 +65,7 @@ spec:
             name: eso-flink-sa-{{ include "flink-pipeline-template.serviceAccountName" . }}
 {{- end }}
 ```
-Step 2.3 Create **serviceaccount-secretstore.yaml**.
+Step 2.3 Create **serviceaccount-secretstore.yaml**.\
 The **serviceaccount-secretstore.yaml** file creates a Kubernetes ServiceAccount named `eso-flink-sa-{{ include "flink-pipeline-template.serviceAccountName" . }}` when datadogConfig.enabled is true,
 with an optional annotation for an AWS role ARN if smSecretRole is provided, enabling secure access on the ServiceAccount to AWS Secrets Manager for fetching secrets.
 
@@ -84,7 +84,7 @@ metadata:
   {{- end }}
 {{- end }}
 ```
-Step 3 Confugiration on **flinkdeployment.yaml**.
+Step 3 Confugiration on **flinkdeployment.yaml**.\
 The following configuration on **flinkdeployment.yaml** enables Datadog integration for monitoring and logging in Flink.
 It sets the DD_APIKEY environment variable to securely fetch the Datadog API key from the Kubernetes ExternalSecret named `externalsecret-datadog-{{ include "flink-pipeline-template.fullname" . }}`, 
 using the apiKey reference. Then, if Datadog is enabled and `flinkConfDir` is defined, it sets the `FLINK_CONF_DIR` environment variable accordingly. 
@@ -93,8 +93,9 @@ enabling logical identifiers, defining Flink-specific metrics scopes, and adding
 
 Example from **flinkdeployment.yaml**:
 
-```
+
 #dd_apikey
+```
             - name: DD_APIKEY
               valueFrom:
                 secretKeyRef:
@@ -102,12 +103,14 @@ Example from **flinkdeployment.yaml**:
                   key: apiKey
 ```
 #Flink conf dir
+```
             {{- if and (.Values.datadogConfig.enabled) (.Values.datadogConfig.flinkConfDir) }}
             - name: FLINK_CONF_DIR
               value: "{{ .Values.datadogConfig.flinkConfDir }}"
             {{- end}}
 ```
 #Datadog metrics
+```
     {{- if .Values.datadogConfig.enabled }}
     kubernetes.jobmanager.labels: {{ include "flink-pipeline-template.dd-labels-logs" . }}
     kubernetes.taskmanager.labels: {{ include "flink-pipeline-template.dd-labels-logs" . }}
@@ -124,6 +127,7 @@ Example from **flinkdeployment.yaml**:
     {{- end }}
 ```
 #logConfiguration
+```
   {{- if .Values.datadogConfig.enabled }}
   logConfiguration:
     "log4j-console.properties": |
@@ -156,7 +160,8 @@ Example from **flinkdeployment.yaml**:
   {{- end }}
 ```
 ```
-Step 4 datadogConfig in the **values** files.
+```
+Step 4 `datadogConfig` in the **values** files.\
 The `fullnameOverride` name in the **values** files for different environments (such as **Dev**, **Uat**, etc.) overrides the chart name specified in the **Chart.yaml** file.
 The below example from **values-dev.yaml** file shows how the worded name should look.
 `fullnameOverride: "dip-dt-auth-acquirer-requested"`
@@ -179,8 +184,8 @@ datadogConfig:
     businessUnit: Planet-Portal    #specifies a label that categorizes the pods by the business unit.
 ```
 
-Step 5 Confugiration on **_helpers.tpl**.
-The following DataDog functions were introduced in **_helpers.tpl**:
+Step 5 Confugiration on **_helpers.tpl**.\
+The following DataDog functions were introduced in **_helpers.tpl**:\
 Internal Labels Function - `_flink-pipeline-template.dd-labels`: Defines default Datadog labels by setting service to the fully qualified chart name (as defined by `flink-pipeline-template.fullname`)
 and version to the image tag or "latest", then outputs them in JSON format for consistent use.
 Metrics Labels - `flink-pipeline-template.dd-labels-print-metrics`: Iterates over each label key-value pair, formatting them as key:value and separating each with a comma for metrics tagging.
@@ -204,7 +209,7 @@ Internal labels function
 {{- end }}
 {{- mustToJson $labels  }}
 {{- end }}
-```
+
 {{/*
 Metrics labels
 */}}
@@ -216,7 +221,7 @@ Metrics labels
 {{- define "flink-pipeline-template.dd-labels-metrics" -}}
 {{- include "flink-pipeline-template.dd-labels-print-metrics" (mustFromJson ( include "_flink-pipeline-template.dd-lables" . )) | trimSuffix ", "}}
 {{- end }}
-```
+
 {{/*
 Logs labels
 */}}
@@ -230,7 +235,7 @@ Logs labels
 {{- end }}
 ```
 
-Step 6 Confugration on the **docker-entrypoint.sh** script.
+Step 6 Confugration on the **docker-entrypoint.sh** script.\
 The **docker-entrypoint.sh** script facilitates the setup of the Flink environment by initializing configuration files and setting important options,
 ensuring that the application is correctly configured before it starts running.The `FLINK_CONF_DIR` variable defaults to `/opt/etl/conf` if not explicitly defined, and it creates that directory along with an empty `flink-conf.yaml` file within it. 
 The script then copies the default `flink-conf.yaml` from `/opt/flink/conf/` to the new configuration directory, setting the `metrics.reporter.dghttp.apikey` option to the value of `DD_APIKEY`. 
