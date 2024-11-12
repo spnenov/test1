@@ -159,14 +159,13 @@ Example from **flinkdeployment.yaml**:
       logger.netty.level = OFF
   {{- end }}
 ```
-```
-```
+
 Step 4 `datadogConfig` in the **values** files.\
 The `fullnameOverride` name in the **values** files for different environments (such as **Dev**, **Uat**, etc.) overrides the chart name specified in the **Chart.yaml** file.
 The below example from **values-dev.yaml** file shows how the worded name should look.
 `fullnameOverride: "dip-dt-auth-acquirer-requested"`
 
-The below datadogConfig section in the velues files enables Datadog integration, setting the Flink conf path, AWS Secrets Manager Api key(smSecret) and role ARN(smSecret),
+The below `datadogConfig` section in the velues files enables Datadog integration, setting the Flink conf path, AWS Secrets Manager Api key(smSecret) and role ARN(smSecret),
 along with custom lablels to tag pods and metrics with environemnt specific metadata for monitoring.
 
 Example from **values-dev.yaml** file:
@@ -187,9 +186,9 @@ datadogConfig:
 Step 5 Confugiration on **_helpers.tpl**.\
 The following DataDog functions were introduced in **_helpers.tpl**:\
 Internal Labels Function - `_flink-pipeline-template.dd-labels`: Defines default Datadog labels by setting service to the fully qualified chart name (as defined by `flink-pipeline-template.fullname`)
-and version to the image tag or "latest", then outputs them in JSON format for consistent use.
+and version to the image tag or "latest", then outputs them in JSON format for consistent use.\
 Metrics Labels - `flink-pipeline-template.dd-labels-print-metrics`: Iterates over each label key-value pair, formatting them as key:value and separating each with a comma for metrics tagging.
-`flink-pipeline-template.dd-labels-metrics`: Calls the dd-labels-print-metrics function to format the JSON labels for metrics, then removes any trailing comma.
+`flink-pipeline-template.dd-labels-metrics`: Calls the dd-labels-print-metrics function to format the JSON labels for metrics, then removes any trailing comma.\
 Logs Labels - `flink-pipeline-template.dd-labels-print-logs`: Formats each label for log tagging by adding the tags.datadoghq.com/ prefix to the key-value pairs, separated by commas.
 `flink-pipeline-template.dd-labels-logs`: Calls the dd-labels-print-logs function, passing JSON-formatted labels, and trims any trailing commas to ensure a clean output for Datadog log tagging.
 
@@ -249,7 +248,6 @@ mkdir -p $FLINK_CONF_DIR
 touch $CONF_FILE
 ```
 ```
-
 #We override the default config file location and add some config options here
 cat /opt/flink/conf/flink-conf.yaml > ${FLINK_CONF_DIR}/flink-conf.yaml
 set_config_option  metrics.reporter.dghttp.apikey ${DD_APIKEY}
