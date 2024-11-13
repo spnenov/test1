@@ -3,7 +3,7 @@
 The Flink Datadog integration enables streamlined monitoring, metrics tracking, and log management across Kubernetes resources.<br>
 In order to achieve this integration, the following steps must be carried out.
 
-Step 1 Set **Worker name**.\
+Step 1 Set **Worker name**.<br>
 The name in the Chart.yaml file `flink-pipeline-template` must be meaningful, as it will be used in all files in `chart/` folder and will represent the **worker's name**.
 For example, in the following repository `dataeng-dip-etl-dt-auth-acquirerrequested`, the name in the Chart.yaml is represented as follows: `flink-dip-acquirer-requested`.
 
@@ -84,7 +84,7 @@ metadata:
   {{- end }}
 {{- end }}
 ```
-Step 3 Confugiration on **flinkdeployment.yaml**.\
+Step 3 Confugiration on **flinkdeployment.yaml**.<br>
 The following configuration on **flinkdeployment.yaml** enables Datadog integration for monitoring and logging in Flink.
 It sets the `DD_APIKEY` environment variable to securely fetch the Datadog API key from the Kubernetes ExternalSecret named `externalsecret-datadog-{{ include "flink-pipeline-template.fullname" . }}`, 
 using the apiKey reference. Then, if Datadog is enabled and `flinkConfDir` is defined, it sets the `FLINK_CONF_DIR` environment variable accordingly. 
@@ -160,7 +160,7 @@ Example from **flinkdeployment.yaml**:
   {{- end }}
 ```
 
-Step 4 `datadogConfig` in the **values** files.\
+Step 4 `datadogConfig` in the **values** files.<br>
 The `fullnameOverride` name in the **values** files for different environments (such as **Dev**, **Uat**, etc.) overrides the chart name specified in the **Chart.yaml** file.
 The below example from **values-dev.yaml** file shows how the worded name should look.
 `fullnameOverride: "dip-dt-auth-acquirer-requested"`
@@ -183,12 +183,12 @@ datadogConfig:
     businessUnit: Planet-Portal    #specifies a label that categorizes the pods by the business unit.
 ```
 
-Step 5 Confugiration on **_helpers.tpl**.\
-The following DataDog functions were introduced in **_helpers.tpl**:\
+Step 5 Confugiration on **_helpers.tpl**.<br>
+The following DataDog functions were introduced in **_helpers.tpl**:<br>
 Internal Labels Function - `_flink-pipeline-template.dd-labels`: Defines default Datadog labels by setting service to the fully qualified chart name (as defined by `flink-pipeline-template.fullname`)
-and version to the image tag or "latest", then outputs them in JSON format for consistent use.\
+and version to the image tag or "latest", then outputs them in JSON format for consistent use.<br>
 Metrics Labels - `flink-pipeline-template.dd-labels-print-metrics`: Iterates over each label key-value pair, formatting them as key:value and separating each with a comma for metrics tagging.
-`flink-pipeline-template.dd-labels-metrics`: Calls the dd-labels-print-metrics function to format the JSON labels for metrics, then removes any trailing comma.\
+`flink-pipeline-template.dd-labels-metrics`: Calls the dd-labels-print-metrics function to format the JSON labels for metrics, then removes any trailing comma.<br>
 Logs Labels - `flink-pipeline-template.dd-labels-print-logs`: Formats each label for log tagging by adding the tags.datadoghq.com/ prefix to the key-value pairs, separated by commas.
 `flink-pipeline-template.dd-labels-logs`: Calls the dd-labels-print-logs function, passing JSON-formatted labels, and trims any trailing commas to ensure a clean output for Datadog log tagging.
 
@@ -234,7 +234,7 @@ Logs labels
 {{- end }}
 ```
 
-Step 6 Confugration on the **docker-entrypoint.sh** script.\
+Step 6 Confugration on the **docker-entrypoint.sh** script.<br>
 The **docker-entrypoint.sh** script facilitates the setup of the Flink environment by initializing configuration files and setting important options,
 ensuring that the application is correctly configured before it starts running.The `FLINK_CONF_DIR` variable defaults to `/opt/etl/conf` if not explicitly defined, and it creates that directory along with an empty `flink-conf.yaml` file within it. 
 The script then copies the default `flink-conf.yaml` from `/opt/flink/conf/` to the new configuration directory, setting the `metrics.reporter.dghttp.apikey` option to the value of `DD_APIKEY`. 
@@ -254,7 +254,7 @@ set_config_option  metrics.reporter.dghttp.apikey ${DD_APIKEY}
 cat /opt/flink/conf/log4j-console.properties >  ${FLINK_CONF_DIR}/log4j-console.properties
 ```
 
-Step 7 Logging on the **Dockerfile**.
+Step 7 Logging on the **Dockerfile**.<br>
 The follwoing three libraries are added to the **Dockerfile** as they are relate to having JSON logging instead of textual ones, which allows DataDog to group the logs in a more normal way.
 
 The additional libraries in the **Dockerfile** are as follows:
