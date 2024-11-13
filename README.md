@@ -1,6 +1,6 @@
 ## Flink DataDog integration
 
-The Flink Datadog integration enables streamlined monitoring, metrics tracking, and log management across Kubernetes resources.\
+The Flink Datadog integration enables streamlined monitoring, metrics tracking, and log management across Kubernetes resources.<br>
 In order to achieve this integration, the following steps must be carried out.
 
 Step 1 Set **Worker name**.\
@@ -11,8 +11,8 @@ If you want to use this template for another pipeline you have to change all ref
 The fastest way doing this is using the command 
 ```grep -rl flink-pipeline-template chart/ | xargs sed -i 's/flink-pipeline-template/flink-dip-acquirer-requested/'```
 
-Step 2 Introduce the secret and all the related components around it.\
-Step 2.1 Create **externalsecret-datadogapi.yaml**.\
+Step 2 Introduce the secret and all the related components around it.<br>
+Step 2.1 Create **externalsecret-datadogapi.yaml**.<br>
 The **externalsecret-datadogapi.yaml** file sets up an ExternalSecret in Kubernetes to securely retrieve the Datadog API key from an external secret manager when datadogConfig.enabled is true. 
 The name `externalsecret-datadog-{{ include "flink-pipeline-template.fullname" . }}` gives a unique identifier for the ExternalSecret, while `{{ include "flink-pipeline-template.labels" . | nindent 4 }}` applies standardized labels.
 The spec section specifies the refresh interval for fetching the secret, the reference to the secret store, and the key-value mapping for the API key, ensuring the secret is kept up-to-date and accessible to the application.
@@ -41,7 +41,7 @@ spec:
       metadataPolicy: None
 {{- end }}
 ```
-Step 2.2 Create **secretstore.yaml**.\
+Step 2.2 Create **secretstore.yaml**.<br>
 The **secretstore.yaml** file defines a SecretStore resource in Kubernetes to securely connect to AWS Secrets Manager when datadogConfig.enabled is true.
 It uses JWT authentication with a specified service account to securely retrieve secrets from the corresponding AWS region.
 
@@ -65,7 +65,7 @@ spec:
             name: eso-flink-sa-{{ include "flink-pipeline-template.serviceAccountName" . }}
 {{- end }}
 ```
-Step 2.3 Create **serviceaccount-secretstore.yaml**.\
+Step 2.3 Create **serviceaccount-secretstore.yaml**.<br>
 The **serviceaccount-secretstore.yaml** file creates a Kubernetes ServiceAccount named `eso-flink-sa-{{ include "flink-pipeline-template.serviceAccountName" . }}` when datadogConfig.enabled is true,
 with an optional annotation for an AWS role ARN if smSecretRole is provided, enabling secure access on the ServiceAccount to AWS Secrets Manager for fetching secrets.
 
@@ -86,7 +86,7 @@ metadata:
 ```
 Step 3 Confugiration on **flinkdeployment.yaml**.\
 The following configuration on **flinkdeployment.yaml** enables Datadog integration for monitoring and logging in Flink.
-It sets the DD_APIKEY environment variable to securely fetch the Datadog API key from the Kubernetes ExternalSecret named `externalsecret-datadog-{{ include "flink-pipeline-template.fullname" . }}`, 
+It sets the `DD_APIKEY` environment variable to securely fetch the Datadog API key from the Kubernetes ExternalSecret named `externalsecret-datadog-{{ include "flink-pipeline-template.fullname" . }}`, 
 using the apiKey reference. Then, if Datadog is enabled and `flinkConfDir` is defined, it sets the `FLINK_CONF_DIR` environment variable accordingly. 
 Additionally, it enables Datadog metrics and log labeling, applying custom log labels to JobManager and TaskManager pods, designating Datadog as the HTTP metrics reporter in the EU data center, 
 enabling logical identifiers, defining Flink-specific metrics scopes, and adding extra metrics tags through dd-labels-metrics. It sets up a log4j-console.properties configuration that logs to the console in a compact JSON format, with log levels set for common libraries and suppresses certain Netty warnings to ensure clean and informative output.
