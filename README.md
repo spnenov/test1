@@ -3,7 +3,7 @@
 The Flink Datadog integration enables streamlined monitoring, metrics tracking, and log management across Kubernetes resources.<br>
 In order to achieve this integration, the following steps must be carried out.
 
-Step 1 Set **Worker name**.<br>
+### 1. Worker name ###
 The name in the Chart.yaml file `flink-pipeline-template` must be meaningful, as it will be used in all files in `chart/` folder and will represent the **worker's name**.
 For example, in the following repository `dataeng-dip-etl-dt-auth-acquirerrequested`, the name in the Chart.yaml is represented as follows: `flink-dip-acquirer-requested`.
 
@@ -11,8 +11,8 @@ If you want to use this template for another pipeline you have to change all ref
 The fastest way doing this is using the command 
 ```grep -rl flink-pipeline-template chart/ | xargs sed -i 's/flink-pipeline-template/flink-dip-acquirer-requested/'```
 
-Step 2 Introduce the DataDog secret and all the related components around it.<br>
-Step 2.1 Create **externalsecret-datadogapi.yaml**.<br>
+### 2. Introduce the DataDog secret and all the related components around it ###
+#### 2.1 Create externalsecret-datadogapi.yaml ####
 The **externalsecret-datadogapi.yaml** file sets up an ExternalSecret in Kubernetes to securely retrieve the Datadog API key from an external secret manager when datadogConfig.enabled is true. 
 The name `externalsecret-datadog-{{ include "flink-pipeline-template.fullname" . }}` gives a unique identifier for the ExternalSecret, while `{{ include "flink-pipeline-template.labels" . | nindent 4 }}` applies standardized labels.
 The "spec" section specifies the refresh interval for fetching the secret, the reference to the secret store, and the key-value mapping for the API key, ensuring the secret is kept up-to-date and accessible to the application.
