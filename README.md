@@ -159,7 +159,6 @@ Example from **flinkdeployment.yaml**:
       logger.netty.level = OFF
   {{- end }}
 ```
-
 Step 4 `datadogConfig` in the **values** files.<br>
 The `fullnameOverride` name in the **values** files for different environments (such as **Dev**, **Uat**, etc.) overrides the chart name specified in the **Chart.yaml** file.
 The below example from **values-dev.yaml** file shows how the worded name should look.
@@ -182,7 +181,6 @@ datadogConfig:
     level3: TBC
     businessUnit: Planet-Portal    #specifies a label that categorizes the pods by the business unit.
 ```
-
 Step 5 Confugiration on **_helpers.tpl**.<br>
 The following DataDog functions were introduced in **_helpers.tpl**:<br>
 Internal Labels Function - `_flink-pipeline-template.dd-labels`: Defines default Datadog labels by setting service to the fully qualified chart name (as defined by `flink-pipeline-template.fullname`)
@@ -233,7 +231,6 @@ Logs labels
 {{- include "flink-pipeline-template.dd-labels-print-logs" (mustFromJson (include "_flink-pipeline-template.dd-labels" .)) | trimSuffix ", "}}
 {{- end }}
 ```
-
 Step 6 Confugration on the **docker-entrypoint.sh** script.<br>
 The **docker-entrypoint.sh** script facilitates the setup of the Flink environment by initializing configuration files and setting important options,
 ensuring that the application is correctly configured before it starts running.The `FLINK_CONF_DIR` variable defaults to `/opt/etl/conf` if not explicitly defined, and it creates that directory along with an empty `flink-conf.yaml` file within it. 
@@ -253,7 +250,6 @@ cat /opt/flink/conf/flink-conf.yaml > ${FLINK_CONF_DIR}/flink-conf.yaml
 set_config_option  metrics.reporter.dghttp.apikey ${DD_APIKEY}
 cat /opt/flink/conf/log4j-console.properties >  ${FLINK_CONF_DIR}/log4j-console.properties
 ```
-
 Step 7 Logging on the **Dockerfile**.<br>
 The follwoing three libraries are added to the **Dockerfile** as they are relate to having JSON logging instead of textual ones, which allows DataDog to group the logs in a more normal way.
 
