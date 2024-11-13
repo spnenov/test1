@@ -41,7 +41,7 @@ spec:
       metadataPolicy: None
 {{- end }}
 ```
-Step 2.2 Create **secretstore.yaml**.<br>
+#### 2.2 Create **secretstore.yaml** ####
 The **secretstore.yaml** file defines a SecretStore resource in Kubernetes to securely connect to AWS Secrets Manager when datadogConfig.enabled is true.
 It uses JWT authentication with a specified service account to securely retrieve secrets from the corresponding AWS region.
 
@@ -65,7 +65,7 @@ spec:
             name: eso-flink-sa-{{ include "flink-pipeline-template.serviceAccountName" . }}
 {{- end }}
 ```
-Step 2.3 Create **serviceaccount-secretstore.yaml**.<br>
+#### 2.3 Create **serviceaccount-secretstore.yaml** ####
 The **serviceaccount-secretstore.yaml** file creates a Kubernetes ServiceAccount named `eso-flink-sa-{{ include "flink-pipeline-template.serviceAccountName" . }}` when datadogConfig.enabled is true,
 with an optional annotation for an AWS role ARN if smSecretRole is provided, enabling secure access on the ServiceAccount to AWS Secrets Manager for fetching secrets.
 
@@ -84,7 +84,7 @@ metadata:
   {{- end }}
 {{- end }}
 ```
-Step 3 Confugiration on **flinkdeployment.yaml**.<br>
+### 3 Confugiration on **flinkdeployment.yaml** ###
 The following configuration on **flinkdeployment.yaml** enables Datadog integration for monitoring and logging in Flink.
 It sets the `DD_APIKEY` environment variable to securely fetch the Datadog API key from the Kubernetes ExternalSecret named `externalsecret-datadog-{{ include "flink-pipeline-template.fullname" . }}`, 
 using the apiKey reference. Then, if Datadog is enabled and `flinkConfDir` is defined, it sets the `FLINK_CONF_DIR` environment variable accordingly. 
@@ -159,7 +159,7 @@ Example from **flinkdeployment.yaml**:
       logger.netty.level = OFF
   {{- end }}
 ```
-Step 4 Confugiration on **_helpers.tpl**.<br>
+### 4 Confugiration on **_helpers.tpl** ###
 The following DataDog functions were introduced in **_helpers.tpl**:<br>
 Internal Labels Function - `_flink-pipeline-template.dd-labels`: Defines default Datadog labels by setting service to the fully qualified chart name (as defined by `flink-pipeline-template.fullname`)
 and version to the image tag or "latest", then outputs them in JSON format for consistent use.<br>
@@ -209,7 +209,7 @@ Logs labels
 {{- include "flink-pipeline-template.dd-labels-print-logs" (mustFromJson (include "_flink-pipeline-template.dd-labels" .)) | trimSuffix ", "}}
 {{- end }}
 ```
-Step 5 `datadogConfig` in the **values** files.<br>
+### 5 `datadogConfig` in the **values** files ###
 The `fullnameOverride` name in the **values** files for different environments (such as **Dev**, **Uat**, etc.) overrides the chart name specified in the **Chart.yaml** file.
 The below example from **values-dev.yaml** file shows how the worded name should look.
 `fullnameOverride: "dip-dt-auth-acquirer-requested"`
@@ -231,7 +231,7 @@ datadogConfig:
     level3: TBC
     businessUnit: Planet-Portal    #specifies a label that categorizes the pods by the business unit.
 ```
-Step 6 Confugration on the **docker-entrypoint.sh** script.<br>
+### 6 Confugration on the **docker-entrypoint.sh** script ###
 The **docker-entrypoint.sh** script facilitates the setup of the Flink environment by initializing configuration files and setting important options,
 ensuring that the application is correctly configured before it starts running.The `FLINK_CONF_DIR` variable defaults to `/opt/etl/conf` if not explicitly defined, and it creates that directory along with an empty `flink-conf.yaml` file within it. 
 The script then copies the default `flink-conf.yaml` from `/opt/flink/conf/` to the new configuration directory, setting the `metrics.reporter.dghttp.apikey` option to the value of `DD_APIKEY`. 
@@ -250,7 +250,7 @@ cat /opt/flink/conf/flink-conf.yaml > ${FLINK_CONF_DIR}/flink-conf.yaml
 set_config_option  metrics.reporter.dghttp.apikey ${DD_APIKEY}
 cat /opt/flink/conf/log4j-console.properties >  ${FLINK_CONF_DIR}/log4j-console.properties
 ```
-Step 7 Logging on the **Dockerfile**.<br>
+### 7 Logging on the **Dockerfile** ###
 The follwoing three libraries are added to the **Dockerfile** as they are relate to having JSON logging instead of textual ones, which allows DataDog to group the logs in a more normal way.
 
 The additional libraries in the **Dockerfile** are as follows:
