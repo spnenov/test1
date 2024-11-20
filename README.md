@@ -11,7 +11,7 @@ One of the fastest ways to do this is by using the command:
 
 The name in the [Chart.yaml](chart/Chart.yaml) file, `flink-pipeline-template-chart`, derived it by the execution on the Helm publisher `publish-helm-chart.yml` action, Once the `publish-helm-chart.yml` action is executed, a GitHub package is created in the repository using this chart name with the suffix, '-chart'.
 
-For example, in the following repository `dataeng-dip-etl-dt-auth-acquirerrequested`, the name in the [Chart.yaml](chart/Chart.yaml) is represented as follows: `dataeng-dip-etl-dt-auth-acquirerrequested-chart`.
+For example, in the following repository `dataeng-dip-etl-dt-auth-acquirerrequested`, the name in the Chart.yaml is represented as follows: `dataeng-dip-etl-dt-auth-acquirerrequested-chart`.
 
 ### 2. Introduce the DataDog secret and all the related components around it
 #### 2.1 Create externalsecret-datadogapi.yaml
