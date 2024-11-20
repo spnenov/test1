@@ -4,12 +4,14 @@ The Flink Datadog integration enables streamlined monitoring, metrics tracking, 
 In order to achieve this integration, the following steps must be carried out.
 
 ### 1. Worker name
-The name in the [Chart.yaml](chart/Chart.yaml) file `flink-pipeline-template` must be meaningful, as it will be used in all files in `chart/` folder and will represent the **worker's name**.
-For example, in the following repository `dataeng-dip-etl-dt-auth-acquirerrequested`, the name in the Chart.yaml is represented as follows: `flink-dip-acquirer-requested`.
+If you want to use this template for another pipeline you have to change all references of `flink-pipeline-template` in all files from `chart/` folder except Chart.yaml to `your_new_pipeline_name`for example to `flink-dip-acquirer-requested`as it will represent the **worker's name**.
 
-If you want to use this template for another pipeline you have to change all references of `flink-pipeline-template` in all files in `chart/` folder to `your_new_pipeline_name` for example to `flink-dip-acquirer-requested`.
-The fastest way doing this is using the command 
-```grep -rl flink-pipeline-template chart/ | xargs sed -i 's/flink-pipeline-template/flink-dip-acquirer-requested/'```
+One of the fastest ways to do this is by using the command:
+```grep -rl --exclude='Chart.yaml' flink-pipeline-template chart/ | xargs sed -i 's/flink-pipeline-template/flink-dip-acquirer-requested/'``
+
+The name in the [Chart.yaml](chart/Chart.yaml) file, `flink-pipeline-template-chart`, derived it by the execution on the Helm publisher `publish-helm-chart.yml` action, Once the `publish-helm-chart.yml` action is executed, a GitHub package is created in the repository using this chart name with the suffix, '-chart'.
+
+For example, in the following repository `dataeng-dip-etl-dt-auth-acquirerrequested`, the name in the [Chart.yaml](chart/Chart.yaml) is represented as follows: `dataeng-dip-etl-dt-auth-acquirerrequested-chart`.
 
 ### 2. Introduce the DataDog secret and all the related components around it
 #### 2.1 Create externalsecret-datadogapi.yaml
