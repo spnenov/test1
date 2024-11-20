@@ -4,7 +4,7 @@ The Flink Datadog integration enables streamlined monitoring, metrics tracking, 
 In order to achieve this integration, the following steps must be carried out.
 
 ### 1. Worker name
-If you want to use this template for another pipeline you have to change all references of `flink-pipeline-template` in all files from `chart/` folder except Chart.yaml to `your_new_pipeline_name`for example to `flink-dip-acquirer-requested`as it will represent the **worker's name**.
+If you want to use this template for another pipeline you have to change all references of `flink-pipeline-template` in all files from `chart/` folder except **Chart.yaml** to `your_new_pipeline_name`for example to `flink-dip-acquirer-requested`as it will represent the **worker's name**.
 One of the fastest ways to do this is by using the command:
 
 ```grep -rl --exclude='Chart.yaml' flink-pipeline-template chart/ | xargs sed -i 's/flink-pipeline-template/flink-dip-acquirer-requested/'```
